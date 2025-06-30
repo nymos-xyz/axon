@@ -1,0 +1,20 @@
+[package]
+name = "axon-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Axon Team"]
+description = "Command-line interface for Axon protocol"
+
+[[bin]]
+name = "axon"
+path = "src/main.rs"
+
+[dependencies]
+axon-core = { path = "../axon-core" }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+hex = "0.4"
+bincode = { workspace = true }

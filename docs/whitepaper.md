@@ -7,7 +7,7 @@ NomadNet is a decentralized, anonymous web platform that combines social network
 
 ### 1. Architecture Overview
 
-***
+```
 NomadNet System Architecture:
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -27,13 +27,13 @@ NomadNet System Architecture:
 │                        Identity Layer                           │
 │                    QuID Authentication                          │
 └─────────────────────────────────────────────────────────────────┘
-***
+```
 
 ### 2. Enhanced Domain System with Smart Contracts
 
 #### 2.1 .nomad Domain Smart Contract Architecture
 
-***
+```
 .nomad Domain System:
 
 Domain Types:
@@ -85,11 +85,11 @@ contract AutoRenewal {
         })
     }
 }
-***
+```
 
 #### 2.2 Adaptive Domain Economics
 
-***
+```
 Smart Contract Domain Pricing (adapts to Nym network health):
 
 contract AdaptiveDomainPricing {
@@ -145,13 +145,13 @@ contract DomainRevenue {
         emit_event(RevenueBurned { amount: burn_amount })
     }
 }
-***
+```
 
 ### 3. Privacy-Enhanced Content Architecture
 
 #### 3.1 zk-STARK Content Authentication
 
-***
+```
 Content Structure with Privacy Proofs:
 
 User Profile (alice.nomad):
@@ -283,11 +283,11 @@ Optional Public Content Revelation:
       authorization_signature: ML-DSA_Signature
   }
 }
-***
+```
 
 #### 3.2 Storage Optimization with Cut-Through
 
-***
+```
 NomadNet Storage Optimization:
 
 Content Chain Cut-Through:
@@ -320,13 +320,13 @@ Public Content Preservation:
 - Public revelations permanently stored on-chain
 - Audit trail maintenance for compliance
 - User controls what remains permanently public
-***
+```
 
 ### 4. Smart Contract-Powered Creator Economy
 
 #### 4.1 Privacy-Preserving Monetization
 
-***
+```
 Creator Economy Smart Contracts:
 
 contract CreatorMonetization {
@@ -395,11 +395,11 @@ contract AnonymousTipping {
         })
     }
 }
-***
+```
 
 #### 4.2 Community Governance Smart Contracts
 
-***
+```
 Decentralized Governance System:
 
 contract NomadNetGovernance {
@@ -445,13 +445,13 @@ contract NomadNetGovernance {
         (stake_weight * 0.4) + (domain_weight * 0.3) + (activity_weight * 0.3)
     }
 }
-***
+```
 
 ### 5. Enhanced Discovery with Privacy
 
 #### 5.1 Anonymous Interest Matching
 
-***
+```
 Privacy-Preserving Discovery:
 
 contract DiscoveryEngine {
@@ -496,13 +496,13 @@ Anonymous Social Matching:
         shared_interest_score: EncryptedScore
     }
 }
-***
+```
 
 ### 6. Integration with Nym Ecosystem
 
 #### 6.1 Cross-Platform Privacy
 
-***
+```
 Nym Ecosystem Integration:
 
 QuID Universal Authentication:
@@ -544,13 +544,13 @@ contract PlatformAnalytics {
         }
     }
 }
-***
+```
 
 ### 7. Technical Implementation
 
 #### 7.1 Node Architecture
 
-***
+```
 NomadNet Node Types:
 
 Full Privacy Nodes:
@@ -576,13 +576,13 @@ Light Nodes:
 - Selective content sync based on following list
 - zk-STARK proof verification for content authenticity
 - Offline content caching with privacy preservation
-***
+```
 
 ### 8. Launch Strategy
 
 #### 8.1 Ecosystem Bootstrap
 
-***
+```
 Multi-Phase Launch Strategy:
 
 Phase 1: Infrastructure Bootstrap
@@ -608,13 +608,13 @@ Phase 4: Mainstream Adoption
 - Traditional social media migration tools
 - Creator incentive programs
 - Global scaling and optimization
-***
+```
 
 ### 9. Success Metrics
 
 #### 9.1 Privacy-First KPIs
 
-***
+```
 Success Metrics:
 
 Technical Privacy Metrics:
@@ -634,7 +634,7 @@ Economic Sustainability Metrics:
 - Adaptive domain pricing maintaining affordability
 - Network economics balancing security and accessibility
 - Long-term platform sustainability without external funding
-***
+```
 
 ### Conclusion
 
