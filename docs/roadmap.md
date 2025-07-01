@@ -31,8 +31,9 @@
 
 ### 1.2 Domain System with Smart Contracts
 
-- [ ] **Week 9-10: .axon Domain Smart Contracts**
-  - Domain registration smart contract deployment
+- [ ] **Week 9-10: Domain Smart Contracts (.quid + .axon)**
+  - .quid social profile registration smart contracts
+  - .axon generic content domain registration smart contracts  
   - Adaptive pricing based on Nym network health
   - Automated domain renewal system
   - Domain transfer and escrow mechanisms
@@ -379,7 +380,7 @@
 - [ ] Community governance without voter identification
 
 ### Adoption Milestones
-- [ ] 100,000+ .axon domains registered in first year
+- [ ] 100,000+ domains registered in first year (.quid social profiles + .axon content domains)
 - [ ] 1,000,000+ anonymous users within 24 months
 - [ ] 10,000+ content creators earning anonymous revenue
 - [ ] 100+ third-party privacy-preserving applications

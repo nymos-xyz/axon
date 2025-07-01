@@ -3,7 +3,7 @@
 
 ### Abstract
 
-Axon is a decentralized, anonymous web platform that combines social networking with a distributed content delivery system. Built on QuID's quantum-resistant identity protocol and Nym's privacy-preserving smart contract blockchain, Axon enables users to own their digital presence through .axon domains while maintaining complete privacy and censorship resistance. The platform leverages Nym's zk-STARK infrastructure, adaptive economics, and storage optimizations to create a truly sovereign social web where creators have absolute authority over their space while preserving the integrity of distributed conversations.
+Axon is a decentralized, anonymous web platform that combines social networking with a distributed content delivery system. Built on QuID's quantum-resistant identity protocol and Nym's privacy-preserving smart contract blockchain, Axon enables users to own their digital presence through a two-tier domain system: .quid domains for social profiles (like decentralized Twitter) and .axon domains for generic content (like .com equivalent) while maintaining complete privacy and censorship resistance. The platform leverages Nym's zk-STARK infrastructure, adaptive economics, and storage optimizations to create a truly sovereign social web where creators have absolute authority over their space while preserving the integrity of distributed conversations.
 
 ### 1. Architecture Overview
 
@@ -31,17 +31,37 @@ Axon System Architecture:
 
 ### 2. Enhanced Domain System with Smart Contracts
 
-#### 2.1 .axon Domain Smart Contract Architecture
+#### 2.1 Two-Tier Domain Smart Contract Architecture
 
 ```
-.axon Domain System:
+Dual Domain System:
 
-Domain Types:
-- Standard domains: alice.axon (5+ characters)
-- Premium domains: ai.axon (2-4 characters)  
-- Vanity domains: 💚.axon (emoji, special chars)
-- Organization domains: company.axon (verified entities)
-- Community domains: group.axon (multi-sig controlled)
+.quid Domains (Social Profiles):
+- Purpose: Decentralized social media profiles (like Twitter @username)
+- Examples: alice.quid, artist.quid, company.quid
+- Content: Social posts, followers, following, profile info
+- Relationship: One QuID identity can link to multiple .quid addresses
+
+.axon Domains (Generic Content):
+- Purpose: Generic content domains (like .com equivalent)  
+- Examples: portfolio.axon, blog.axon, shop.axon
+- Content: Websites, portfolios, businesses, any content
+- Relationship: QuID identity can register unlimited .axon domains
+
+Domain Types (both .quid and .axon):
+- Standard domains: alice.quid / portfolio.axon (5+ characters)
+- Premium domains: ai.quid / dev.axon (2-4 characters)  
+- Vanity domains: 💚.quid / 🎨.axon (emoji, special chars)
+- Organization domains: company.quid / corp.axon (verified entities)
+- Community domains: group.quid / dao.axon (multi-sig controlled)
+
+Integration Flow Example:
+QuID Identity (0x123...abc)
+├── alice.quid (main social profile)
+├── artist.quid (professional profile) 
+├── portfolio.axon (art gallery website)
+├── shop.axon (merchandise store)
+└── blog.axon (personal blog)
 
 Smart Contract Domain Record:
 contract AxonDomain {
@@ -154,14 +174,15 @@ contract DomainRevenue {
 ```
 Content Structure with Privacy Proofs:
 
-User Profile (alice.axon):
+Social Profile (alice.quid):
 {
   profile_info: {
     display_name: "Alice Cooper"
     bio: "Anonymous artist and privacy advocate"
     avatar_hash: SHAKE256
     banner_hash: SHAKE256
-    links: ["portfolio.axon", "art.gallery.axon"]
+    links: ["portfolio.axon", "art.gallery.axon"],  // Links to .axon content domains
+    additional_quids: ["artist.quid"]              // Additional social profiles
   }
   
   // Content with cryptographic authenticity
@@ -624,7 +645,7 @@ Technical Privacy Metrics:
 - 99.9% uptime with complete decentralization
 
 User Adoption Metrics:
-- 100,000+ .axon domains registered in first year
+- 100,000+ domains registered in first year (.quid social profiles + .axon content domains)
 - 1,000,000+ anonymous users within 24 months  
 - 10,000+ active content creators earning revenue
 - 100+ third-party applications built on platform
