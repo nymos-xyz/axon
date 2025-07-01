@@ -1,23 +1,12 @@
 # Axon Development Roadmap
 *Building the Privacy-First Social Web*
 
-## 🎉 MAJOR MILESTONE ACHIEVED: Core Social Features Complete!
-
-**✅ Phase 2.1 COMPLETED** - All core social networking functionality implemented with full privacy preservation:
-- Privacy-preserving following/followers system with zk-STARK proofs
-- Anonymous content interaction system (likes, replies, comments, shares, reports)
-- Feed generation engine with chronological, engagement-based, and trending algorithms
-- Comprehensive privacy controls and anonymous analytics
-- Anti-spam protection and privacy violation detection
-
-**Current Focus**: Next priority is Privacy-Preserving Discovery Engine (Week 33-34)
-
 ## Phase 1: Foundation & Smart Contract Infrastructure (Months 1-6)
 
 ### 1.1 Core Infrastructure & Nym Integration
 
 - [ ] **Week 1-2: Development Environment Setup**
-  - Rust workspace integration with QuID, Nym, and NomadNet codebases
+  - Rust workspace integration with QuID, Nym, and Axon codebases
   - Nym blockchain integration for smart contract deployment
   - zk-STARK library integration and optimization
   - DHT library integration with privacy enhancements
@@ -42,7 +31,7 @@
 
 ### 1.2 Domain System with Smart Contracts
 
-- [ ] **Week 9-10: .nomad Domain Smart Contracts**
+- [ ] **Week 9-10: .axon Domain Smart Contracts**
   - Domain registration smart contract deployment
   - Adaptive pricing based on Nym network health
   - Automated domain renewal system
@@ -390,7 +379,7 @@
 - [ ] Community governance without voter identification
 
 ### Adoption Milestones
-- [ ] 100,000+ .nomad domains registered in first year
+- [ ] 100,000+ .axon domains registered in first year
 - [ ] 1,000,000+ anonymous users within 24 months
 - [ ] 10,000+ content creators earning anonymous revenue
 - [ ] 100+ third-party privacy-preserving applications

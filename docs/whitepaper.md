@@ -1,17 +1,17 @@
-# NomadNet: Decentralized Anonymous Web Platform
+# Axon: Decentralized Anonymous Web Platform
 ## A Social Web Built on QuID Identity and Nym's Privacy-First Blockchain
 
 ### Abstract
 
-NomadNet is a decentralized, anonymous web platform that combines social networking with a distributed content delivery system. Built on QuID's quantum-resistant identity protocol and Nym's privacy-preserving smart contract blockchain, NomadNet enables users to own their digital presence through .nomad domains while maintaining complete privacy and censorship resistance. The platform leverages Nym's zk-STARK infrastructure, adaptive economics, and storage optimizations to create a truly sovereign social web where creators have absolute authority over their space while preserving the integrity of distributed conversations.
+Axon is a decentralized, anonymous web platform that combines social networking with a distributed content delivery system. Built on QuID's quantum-resistant identity protocol and Nym's privacy-preserving smart contract blockchain, Axon enables users to own their digital presence through .axon domains while maintaining complete privacy and censorship resistance. The platform leverages Nym's zk-STARK infrastructure, adaptive economics, and storage optimizations to create a truly sovereign social web where creators have absolute authority over their space while preserving the integrity of distributed conversations.
 
 ### 1. Architecture Overview
 
 ```
-NomadNet System Architecture:
+Axon System Architecture:
 
 ┌─────────────────────────────────────────────────────────────────┐
-│                        NomadNet Layer                           │
+│                        Axon Layer                               │
 ├─────────────────────────────────────────────────────────────────┤
 │ Discovery Engine │ Content Renderer │ Social Graph │ Feed Engine │
 ├─────────────────────────────────────────────────────────────────┤
@@ -31,20 +31,20 @@ NomadNet System Architecture:
 
 ### 2. Enhanced Domain System with Smart Contracts
 
-#### 2.1 .nomad Domain Smart Contract Architecture
+#### 2.1 .axon Domain Smart Contract Architecture
 
 ```
-.nomad Domain System:
+.axon Domain System:
 
 Domain Types:
-- Standard domains: alice.nomad (5+ characters)
-- Premium domains: ai.nomad (2-4 characters)  
-- Vanity domains: 💚.nomad (emoji, special chars)
-- Organization domains: company.nomad (verified entities)
-- Community domains: group.nomad (multi-sig controlled)
+- Standard domains: alice.axon (5+ characters)
+- Premium domains: ai.axon (2-4 characters)  
+- Vanity domains: 💚.axon (emoji, special chars)
+- Organization domains: company.axon (verified entities)
+- Community domains: group.axon (multi-sig controlled)
 
 Smart Contract Domain Record:
-contract NomadDomain {
+contract AxonDomain {
     domain_name: String
     owner_quid: QuID_Identity
     content_root_hash: SHAKE256
@@ -129,7 +129,7 @@ contract DomainRevenue {
     
     distribution_percentages: {
         network_security_fund: 35%,    // Hybrid PoW/PoS incentives
-        platform_development: 25%,     // NomadNet development
+        platform_development: 25%,     // Axon development
         quid_foundation: 15%,          // Core identity protocol
         adaptive_token_burn: 15%,      // Burns more during low activity
         registrar_rewards: 10%         // Node operation incentives
@@ -154,14 +154,14 @@ contract DomainRevenue {
 ```
 Content Structure with Privacy Proofs:
 
-User Profile (alice.nomad):
+User Profile (alice.axon):
 {
   profile_info: {
     display_name: "Alice Cooper"
     bio: "Anonymous artist and privacy advocate"
     avatar_hash: SHAKE256
     banner_hash: SHAKE256
-    links: ["portfolio.nomad", "art.gallery.nomad"]
+    links: ["portfolio.axon", "art.gallery.axon"]
   }
   
   // Content with cryptographic authenticity
@@ -288,7 +288,7 @@ Optional Public Content Revelation:
 #### 3.2 Storage Optimization with Cut-Through
 
 ```
-NomadNet Storage Optimization:
+Axon Storage Optimization:
 
 Content Chain Cut-Through:
 - Apply MimbleWimble-inspired optimizations to content history
@@ -402,7 +402,7 @@ contract AnonymousTipping {
 ```
 Decentralized Governance System:
 
-contract NomadNetGovernance {
+contract AxonGovernance {
     proposal_types: {
         platform_features: PlatformProposal,
         economic_parameters: EconomicProposal,
@@ -551,7 +551,7 @@ contract PlatformAnalytics {
 #### 7.1 Node Architecture
 
 ```
-NomadNet Node Types:
+Axon Node Types:
 
 Full Privacy Nodes:
 - Complete DHT index with zk-STARK proof verification
@@ -624,7 +624,7 @@ Technical Privacy Metrics:
 - 99.9% uptime with complete decentralization
 
 User Adoption Metrics:
-- 100,000+ .nomad domains registered in first year
+- 100,000+ .axon domains registered in first year
 - 1,000,000+ anonymous users within 24 months  
 - 10,000+ active content creators earning revenue
 - 100+ third-party applications built on platform
@@ -638,6 +638,6 @@ Economic Sustainability Metrics:
 
 ### Conclusion
 
-NomadNet represents the evolution of social media into a truly private, user-controlled, and economically sustainable platform. By leveraging Nym's advanced privacy infrastructure, QuID's universal identity system, and innovative content ownership models, NomadNet creates a social web where users maintain sovereignty over their digital lives while participating in vibrant, anonymous communities.
+Axon represents the evolution of social media into a truly private, user-controlled, and economically sustainable platform. By leveraging Nym's advanced privacy infrastructure, QuID's universal identity system, and innovative content ownership models, Axon creates a social web where users maintain sovereignty over their digital lives while participating in vibrant, anonymous communities.
 
-The platform's integration with Nym's privacy-preserving smart contracts, adaptive economics, and storage optimizations ensures both immediate usability and long-term sustainability, positioning NomadNet as the flagship application of the privacy-first internet era.
+The platform's integration with Nym's privacy-preserving smart contracts, adaptive economics, and storage optimizations ensures both immediate usability and long-term sustainability, positioning Axon as the flagship application of the privacy-first internet era.
