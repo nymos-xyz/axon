@@ -126,11 +126,17 @@ Current test coverage:
 
 **Current Phase**: Foundation Complete ✅
 
-**Next Steps** (Phase 2):
-- [ ] zk-STARK content authenticity proof system
-- [ ] Content storage system with SHAKE256 addressing
-- [ ] Privacy-enhanced social features (following, engagement)
-- [ ] Anonymous discovery and recommendation engine
+**IMMEDIATE PRIORITY** (Phase 2 - Social Features):
+- [ ] **Following/Followers System** with privacy-preserving social connections
+- [ ] **Content Interaction System** (replies, comments, likes) with zk-STARK proofs
+- [ ] **Feed Generation Engine** with chronological and algorithmic ranking
+- [ ] **Privacy Controls** for all social features and content visibility
+
+**Next Priority** (Phase 3):
+- [ ] Privacy-preserving discovery and recommendation engine
+- [ ] Content storage optimization with MimbleWimble-style cut-through
+- [ ] Creator economy integration with Nym cryptocurrency payments
+- [ ] Anonymous analytics and engagement tracking
 
 ## Security Considerations
 

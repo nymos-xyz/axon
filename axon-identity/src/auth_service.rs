@@ -411,6 +411,19 @@ impl AuthenticationService {
 
         total_duration / sessions.len() as u64
     }
+
+    /// Create a test authentication service
+    #[cfg(test)]
+    pub fn new_for_test() -> Self {
+        let config = AuthConfig {
+            session_duration: 3600, // 1 hour
+            challenge_timeout: 300,  // 5 minutes
+            max_sessions_per_identity: 5,
+            enable_anonymous_sessions: true,
+        };
+        
+        Self::new(config)
+    }
 }
 
 /// Authentication service statistics

@@ -186,6 +186,24 @@ impl QuIDIdentity {
         
         self.metadata.attributes.push(attribute);
     }
+
+    /// Get the identity ID as a string (hex-encoded identity hash)
+    pub fn get_id(&self) -> String {
+        hex::encode(self.identity_hash)
+    }
+
+    /// Create a test identity for unit tests
+    #[cfg(test)]
+    pub fn new_for_test(name: &str) -> Self {
+        // Create a deterministic signing key for testing
+        let mut key_bytes = [0u8; 32];
+        let name_bytes = name.as_bytes();
+        let copy_len = std::cmp::min(name_bytes.len(), 32);
+        key_bytes[..copy_len].copy_from_slice(&name_bytes[..copy_len]);
+        
+        let signing_key = AxonSigningKey::from_bytes(&key_bytes).expect("Valid test key");
+        Self::new(&signing_key)
+    }
 }
 
 impl IdentityProof {

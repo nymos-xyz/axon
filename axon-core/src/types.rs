@@ -27,6 +27,20 @@ impl fmt::Display for ContentHash {
     }
 }
 
+impl ContentHash {
+    /// Create a ContentHash from a string (for testing)
+    #[cfg(test)]
+    pub fn new(data: &str) -> Self {
+        use sha3::{Digest, Sha3_256};
+        let mut hasher = Sha3_256::new();
+        hasher.update(data.as_bytes());
+        let result = hasher.finalize();
+        let mut bytes = [0u8; 32];
+        bytes.copy_from_slice(&result);
+        Self(bytes)
+    }
+}
+
 /// Domain name in the .axon namespace
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct DomainName(String);

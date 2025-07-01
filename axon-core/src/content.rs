@@ -133,6 +133,59 @@ impl Post {
             .expect("Post serialization should not fail");
         crate::crypto::hash_content(&content_bytes)
     }
+
+    /// Get the text content of this post
+    pub fn get_text(&self) -> Option<&str> {
+        self.content.text.as_deref()
+    }
+
+    /// Create a test post for unit tests
+    #[cfg(test)]
+    pub fn new_for_test(text: &str, content_type: ContentType) -> Self {
+        use crate::crypto::AxonSigningKey;
+        
+        let signing_key = AxonSigningKey::generate();
+        let verifying_key = signing_key.verifying_key();
+        
+        let content = PostContent {
+            text: Some(text.to_string()),
+            media_hashes: vec![],
+            shared_content: None,
+            poll_data: None,
+            content_type,
+        };
+        
+        let metadata = PostMetadata {
+            created_at: Timestamp::now(),
+            edited_at: None,
+            visibility: VisibilityLevel::Public,
+            tags: vec![],
+            mentions: vec![],
+            reply_to: None,
+            edit_history: vec![],
+        };
+        
+        let interactions = PostInteractions {
+            replies: vec![],
+            like_count_commitment: [0u8; 32],
+            share_count_commitment: [0u8; 32],
+            view_count_commitment: [0u8; 32],
+            engagement_proof: vec![],
+        };
+        
+        let content_bytes = bincode::serialize(&(&content, &metadata, &interactions))
+            .expect("Serialization should not fail");
+        let signature = signing_key.sign(&content_bytes);
+        
+        Self {
+            id: crate::crypto::hash_content(&content_bytes),
+            author: verifying_key,
+            content,
+            metadata,
+            interactions,
+            signature,
+        }
+    }
 }
 
 impl UserProfile {

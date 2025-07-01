@@ -3,6 +3,7 @@ members = [
     "axon-core",
     "axon-contracts", 
     "axon-identity",
+    "axon-social",
     "axon-cli"
 ]
 resolver = "2"
