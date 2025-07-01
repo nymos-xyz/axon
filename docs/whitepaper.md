@@ -40,13 +40,14 @@ Dual Domain System:
 - Purpose: Decentralized social media profiles (like Twitter @username)
 - Examples: alice.quid, artist.quid, company.quid
 - Content: Social posts, followers, following, profile info
-- Relationship: One QuID identity can link to multiple .quid addresses
+- Relationship: One .quid domain = One QuID identity (1:1 mapping)
+- Multiple Profiles: Requires separate QuID identities
 
 .axon Domains (Generic Content):
 - Purpose: Generic content domains (like .com equivalent)  
 - Examples: portfolio.axon, blog.axon, shop.axon
 - Content: Websites, portfolios, businesses, any content
-- Relationship: QuID identity can register unlimited .axon domains
+- Relationship: One QuID identity = Multiple .axon domains (1:many)
 
 Domain Types (both .quid and .axon):
 - Standard domains: alice.quid / portfolio.axon (5+ characters)
@@ -56,12 +57,17 @@ Domain Types (both .quid and .axon):
 - Community domains: group.quid / dao.axon (multi-sig controlled)
 
 Integration Flow Example:
-QuID Identity (0x123...abc)
-├── alice.quid (main social profile)
-├── artist.quid (professional profile) 
+User "Alice" with Multiple Identities:
+
+QuID Identity #1 (0x123...abc - Personal)
+├── alice.quid (personal social profile)
+├── blog.axon (personal blog)
+└── photos.axon (family photos)
+
+QuID Identity #2 (0x456...def - Professional)  
+├── artist.quid (professional social profile)
 ├── portfolio.axon (art gallery website)
-├── shop.axon (merchandise store)
-└── blog.axon (personal blog)
+└── shop.axon (merchandise store)
 
 Smart Contract Domain Record:
 contract AxonDomain {
@@ -181,8 +187,8 @@ Social Profile (alice.quid):
     bio: "Anonymous artist and privacy advocate"
     avatar_hash: SHAKE256
     banner_hash: SHAKE256
-    links: ["portfolio.axon", "art.gallery.axon"],  // Links to .axon content domains
-    additional_quids: ["artist.quid"]              // Additional social profiles
+    links: ["portfolio.axon", "art.gallery.axon"],  // Links to .axon content domains from this identity
+    identity_note: "For professional profile, user switches to separate QuID identity with artist.quid"
   }
   
   // Content with cryptographic authenticity
@@ -659,6 +665,6 @@ Economic Sustainability Metrics:
 
 ### Conclusion
 
-Axon represents the evolution of social media into a truly private, user-controlled, and economically sustainable platform. By leveraging Nym's advanced privacy infrastructure, QuID's universal identity system, and innovative content ownership models, Axon creates a social web where users maintain sovereignty over their digital lives while participating in vibrant, anonymous communities.
+Axon represents the evolution of social media into a truly private, user-controlled, and economically sustainable platform. By leveraging Nym's advanced privacy infrastructure, QuID's universal identity system, and innovative dual-domain architecture (.quid social profiles + .axon content domains), Axon creates a social web where users maintain sovereignty over their digital lives. Users can easily manage multiple QuID identities for different contexts (personal, professional, etc.) while participating in vibrant, anonymous communities.
 
 The platform's integration with Nym's privacy-preserving smart contracts, adaptive economics, and storage optimizations ensures both immediate usability and long-term sustainability, positioning Axon as the flagship application of the privacy-first internet era.
