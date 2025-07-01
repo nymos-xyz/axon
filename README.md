@@ -15,10 +15,11 @@ Axon is the core protocol for a decentralized social web that prioritizes user p
 
 ```
 axon/
-├── axon-core/          # Core protocol types and cryptography
-├── axon-contracts/     # Smart contracts for domains and governance
-├── axon-identity/      # QuID identity integration and authentication
-├── axon-cli/           # Command-line interface for testing
+├── axon-core/          # Core protocol types and cryptography ✅
+├── axon-contracts/     # Smart contracts for domains and governance ✅
+├── axon-identity/      # QuID identity integration and authentication ✅
+├── axon-social/        # Social networking features ✅ NEW
+├── axon-cli/           # Command-line interface for testing ✅
 └── docs/               # Documentation and roadmap
 ```
 
@@ -33,13 +34,23 @@ axon/
 - [x] **Content System**: Post creation, signing, and verification
 - [x] **CLI Interface**: Working command-line tool for testing
 
+### Phase 2: Social Features (✅ COMPLETED)
+
+- [x] **Privacy-Preserving Social Graph**: Following/followers with zero-knowledge proofs
+- [x] **Content Interaction System**: Likes, replies, comments, shares with anonymity
+- [x] **Feed Generation Engine**: Chronological, engagement-based, and trending algorithms
+- [x] **Privacy Controls**: Comprehensive anonymization and privacy violation detection
+- [x] **Anonymous Analytics**: Engagement tracking without user profiling
+- [x] **Anti-Spam Protection**: Rate limiting, pattern detection, and abuse prevention
+
 ### Technical Achievements
 
-- **15 passing unit tests** covering all core functionality
+- **Core social networking** with complete privacy preservation
+- **Zero-knowledge proofs** for all anonymous interactions
 - **Type-safe cryptography** with proper serialization
 - **Smart contract foundation** for domain management
-- **Privacy-preserving identity** system
-- **Content authenticity** verification
+- **Privacy-first architecture** throughout all social features
+- **Comprehensive test coverage** for all components
 
 ## Quick Start
 
