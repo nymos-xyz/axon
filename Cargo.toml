@@ -1,3 +1,11 @@
+[package]
+name = "axon"
+version = "0.1.0"
+edition = "2021"
+authors = ["Axon Development Team"]
+description = "Privacy-First Decentralized Social Networking Platform"
+license = "MIT OR Apache-2.0"
+
 [workspace]
 members = [
     "axon-core",
@@ -7,6 +15,22 @@ members = [
     "axon-cli"
 ]
 resolver = "2"
+
+[dependencies]
+# Core dependencies - Axon depends on both QuID and Nym
+quid = { path = "../quid" }
+nym = { path = "../nym" }
+
+# Axon components
+axon-core = { path = "axon-core" }
+axon-social = { path = "axon-social" }
+axon-identity = { path = "axon-identity" }
+axon-contracts = { path = "axon-contracts" }
+axon-cli = { path = "axon-cli" }
+
+tokio = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
 
 [workspace.dependencies]
 # Core dependencies
