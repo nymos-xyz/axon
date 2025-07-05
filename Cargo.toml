@@ -12,20 +12,27 @@ members = [
     "axon-contracts", 
     "axon-identity",
     "axon-social",
+    "axon-discovery",
     "axon-cli"
 ]
 resolver = "2"
 
+[lib]
+name = "axon"
+path = "src/lib.rs"
+
 [dependencies]
 # Core dependencies - Axon depends on both QuID and Nym
-quid = { path = "../quid" }
-nym = { path = "../nym" }
+quid-core = { path = "../quid/quid-core" }
+nym-core = { path = "../nym/nym-core" }
+nym-network = { path = "../nym/nym-network" }
 
 # Axon components
 axon-core = { path = "axon-core" }
 axon-social = { path = "axon-social" }
 axon-identity = { path = "axon-identity" }
 axon-contracts = { path = "axon-contracts" }
+axon-discovery = { path = "axon-discovery" }
 axon-cli = { path = "axon-cli" }
 
 tokio = { workspace = true }
