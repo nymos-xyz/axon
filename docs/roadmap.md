@@ -138,7 +138,21 @@
   - Custom algorithm support
   - User-controlled recommendation weights
 
-### 2.3 Content Management & Organization
+### 2.3 NymCompute Integration for Social Computing
+
+- [x] **Week 33-36: Compute-Powered Discovery** ✅ COMPLETED
+  - NymCompute integration for anonymous recommendation algorithms
+  - Privacy-preserving content ranking computations
+  - Decentralized search indexing via NymCompute
+  - Anonymous analytics processing through compute jobs
+
+- [ ] **Week 37-40: Advanced Social Computing**
+  - Anonymous AI-powered content moderation via NymCompute
+  - Privacy-preserving social graph analysis
+  - Decentralized content transcoding and processing
+  - Anonymous real-time recommendation engine
+
+### 2.4 Content Management & Organization
 
 - [ ] **Week 41-42: Advanced Content Features**
   - Rich media support with privacy preservation
