@@ -1,0 +1,69 @@
+[package]
+name = "axon-search"
+version = "0.1.0"
+edition = "2021"
+authors = ["Axon Development Team"]
+description = "Privacy-preserving advanced search engine for Axon social network"
+license = "0BSD"
+repository = "https://github.com/nymverse/axon"
+
+[dependencies]
+# Core Axon dependencies
+axon-core = { path = "../axon-core" }
+axon-discovery = { path = "../axon-discovery" }
+nym-core = { path = "../../nym/nym-core" }
+nym-crypto = { path = "../../nym/nym-crypto" }
+nym-compute = { path = "../../nym/nym-compute" }
+quid-core = { path = "../../quid/quid-core" }
+
+# Async runtime
+tokio = { workspace = true }
+futures = "0.3"
+async-trait = "0.1"
+
+# Cryptographic libraries
+sha3 = { workspace = true }
+rand = { workspace = true }
+zeroize = { features = ["derive"], workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = { workspace = true }
+
+# Error handling and logging
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+
+# Data structures and algorithms
+dashmap = "5.5"
+fxhash = "0.2"
+roaring = "0.10"
+tantivy = "0.21"
+
+# Privacy and cryptography
+aes-gcm = "0.10"
+hkdf = "0.12"
+curve25519-dalek = "4.0"
+
+# Full-text search and indexing
+meilisearch-sdk = { version = "0.25", optional = true }
+sonic-rs = { version = "0.3", optional = true }
+
+# Vector similarity search
+faiss = { version = "0.12", optional = true }
+candle-core = { version = "0.3", optional = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = "0.5"
+proptest = "1.4"
+
+[features]
+default = ["privacy-search", "distributed-index"]
+privacy-search = []
+distributed-index = []
+vector-search = ["faiss", "candle-core"]
+external-engines = ["meilisearch-sdk", "sonic-rs"]
+

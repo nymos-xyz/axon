@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Axon Development Team"]
 description = "Privacy-First Decentralized Social Networking Platform"
-license = "MIT OR Apache-2.0"
+license = "0BSD"
 
 [workspace]
 members = [
@@ -13,6 +13,9 @@ members = [
     "axon-identity",
     "axon-social",
     "axon-discovery",
+    "axon-search",
+    "axon-personalization",
+    "axon-media",
     "axon-cli"
 ]
 resolver = "2"
@@ -33,6 +36,9 @@ axon-social = { path = "axon-social" }
 axon-identity = { path = "axon-identity" }
 axon-contracts = { path = "axon-contracts" }
 axon-discovery = { path = "axon-discovery" }
+axon-search = { path = "axon-search" }
+axon-personalization = { path = "axon-personalization" }
+axon-media = { path = "axon-media" }
 axon-cli = { path = "axon-cli" }
 
 tokio = { workspace = true }
@@ -58,7 +64,6 @@ x25519-dalek = "1.1"
 
 # Async networking
 libp2p = "0.53"
-futures = "0.3"
 
 # Storage
 rocksdb = "0.21"
@@ -69,6 +74,51 @@ postcard = "1.0"
 
 # CLI
 clap = { version = "4.0", features = ["derive"] }
+
+# Math and ML
+ndarray = "0.15"
+rand = "0.8"
+
+# Media processing
+ffmpeg-next = "6.0"
+webrtc = "0.7"
+opus = "0.3"
+image = "0.24"
+flv-rs = "0.3"
+rtmp = "0.5"
+webm = "0.1"
+
+# Utilities
+uuid = { version = "1.0", features = ["v4"] }
+base64 = "0.21"
+hex = "0.4"
+zeroize = "1.6"
+tokio-util = "0.7"
+chrono = "0.4"
+
+# Machine learning
+candle-core = "0.4"
+candle-nn = "0.4"
+smartcore = "0.3"
+
+# Data structures
+dashmap = "5.5"
+fxhash = "0.2"
+roaring = "0.10"
+bloom = "0.3"
+
+# Privacy libraries
+laplacian-noise = "0.3"
+aes-gcm = "0.10"
+curve25519-dalek = "4.0"
+
+# Additional async
+futures = "0.3"
+async-trait = "0.1"
+
+# Search and indexing
+tantivy = "0.21"
+hkdf = "0.12"
 
 [profile.release]
 lto = true
