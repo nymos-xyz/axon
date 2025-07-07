@@ -19,6 +19,7 @@ pub mod interactions;
 pub mod feed;
 pub mod privacy;
 pub mod analytics;
+pub mod advanced_search;
 
 // Re-export main types
 pub use error::{SocialError, SocialResult};
@@ -27,6 +28,7 @@ pub use interactions::{Interaction, InteractionType, Reply, Like, Share, Interac
 pub use feed::{Feed, FeedItem, FeedGenerator, FeedAlgorithm, RankingStrategy};
 pub use privacy::{PrivacyLevel, PrivacyController, AnonymousProof, ProofType, SocialPrivacyManager};
 pub use analytics::{EngagementMetrics, UserMetrics, ContentMetrics, AnonymousAnalytics};
+pub use advanced_search::{AdvancedSearchEngine, SearchConfig, SearchResults, SearchResult, DiscoveryType};
 
 /// Re-export commonly used types from dependencies
 pub use axon_core::{

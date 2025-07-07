@@ -16,7 +16,8 @@ members = [
     "axon-search",
     "axon-personalization",
     "axon-media",
-    "axon-cli"
+    "axon-cli",
+    "axon-creator-economy"
 ]
 resolver = "2"
 
@@ -40,6 +41,7 @@ axon-search = { path = "axon-search" }
 axon-personalization = { path = "axon-personalization" }
 axon-media = { path = "axon-media" }
 axon-cli = { path = "axon-cli" }
+axon-creator-economy = { path = "axon-creator-economy" }
 
 tokio = { workspace = true }
 tracing = { workspace = true }

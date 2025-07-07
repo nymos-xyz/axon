@@ -1,0 +1,21 @@
+[package]
+name = "axon-governance"
+version = "0.1.0"
+edition = "2021"
+description = "Privacy-preserving governance system for Axon"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+sha3 = { workspace = true }
+hex = { workspace = true }
+uuid = { workspace = true }
+
+# Nym ecosystem
+nym-crypto = { path = "../../nym/nym-crypto" }
+axon-core = { path = "../axon-core" }
+
+[dev-dependencies]
+tokio-test = "0.4"
