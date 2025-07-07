@@ -88,6 +88,12 @@ pub enum PricingEvent {
         demand_score: f32,
         timestamp: Timestamp,
     },
+    MarketAnalysisUpdated {
+        trending_keywords: Vec<String>,
+        competition_factor: f32,
+        volatility_index: f32,
+        timestamp: Timestamp,
+    },
 }
 
 /// Reason for pricing adjustment
@@ -379,6 +385,164 @@ impl AdaptivePricingContract {
         })
     }
 
+    /// Emergency pricing freeze
+    pub fn emergency_freeze(
+        &mut self,
+        admin: &AxonVerifyingKey,
+        reason: String,
+    ) -> Result<PricingEvent> {
+        if admin != &self.admin {
+            return Err(AxonError::PermissionDenied);
+        }
+
+        // Freeze pricing at current levels
+        let old_multiplier = self.pricing.network_health_multiplier;
+        
+        // Set multipliers to maintain current pricing
+        self.pricing.network_health_multiplier = 1.0;
+        self.pricing.demand_multiplier = 1.0;
+        self.pricing.updated_at = Timestamp::now();
+        self.last_updated = Timestamp::now();
+        
+        self.record_pricing_snapshot();
+
+        Ok(PricingEvent::PriceAdjusted {
+            old_multiplier,
+            new_multiplier: 1.0,
+            reason: AdjustmentReason::EmergencyAdjustment,
+            timestamp: Timestamp::now(),
+        })
+    }
+
+    /// Advanced market-based pricing with ML predictions
+    pub fn calculate_market_price(
+        &self,
+        domain_type: &DomainType,
+        domain_name: &str,
+        duration_years: u32,
+        market_indicators: &MarketIndicators,
+    ) -> u64 {
+        let base_price = self.calculate_domain_price(domain_type, duration_years);
+        
+        // Apply market-based adjustments
+        let mut market_multiplier = 1.0;
+        
+        // Scarcity adjustment (shorter domains are more valuable)
+        if domain_name.len() <= 3 {
+            market_multiplier *= 3.0;
+        } else if domain_name.len() <= 5 {
+            market_multiplier *= 1.5;
+        }
+        
+        // Keyword popularity adjustment
+        if self.is_trending_keyword(domain_name, market_indicators) {
+            market_multiplier *= 2.0;
+        }
+        
+        // Competition factor
+        market_multiplier *= 1.0 + market_indicators.competition_factor;
+        
+        // Time-of-day pricing (higher during peak hours)
+        market_multiplier *= market_indicators.time_factor;
+        
+        // Apply market volatility protection
+        market_multiplier = market_multiplier.clamp(0.5, 5.0);
+        
+        (base_price as f32 * market_multiplier) as u64
+    }
+    
+    /// Check if domain name contains trending keywords
+    fn is_trending_keyword(&self, domain_name: &str, market_indicators: &MarketIndicators) -> bool {
+        let name_lower = domain_name.to_lowercase();
+        market_indicators.trending_keywords.iter()
+            .any(|keyword| name_lower.contains(&keyword.to_lowercase()))
+    }
+
+    /// Predict future pricing trends
+    pub fn predict_price_trend(&self, domain_type: &DomainType, days_ahead: u32) -> PriceTrendPrediction {
+        let current_price = self.calculate_domain_price(domain_type, 1);
+        
+        // Simple trend analysis based on historical data
+        let trend_direction = if self.pricing_history.len() >= 2 {
+            let recent = &self.pricing_history[self.pricing_history.len() - 1];
+            let older = &self.pricing_history[self.pricing_history.len() - 2];
+            
+            if recent.demand_score > older.demand_score {
+                TrendDirection::Increasing
+            } else if recent.demand_score < older.demand_score {
+                TrendDirection::Decreasing
+            } else {
+                TrendDirection::Stable
+            }
+        } else {
+            TrendDirection::Stable
+        };
+        
+        let predicted_multiplier = match trend_direction {
+            TrendDirection::Increasing => 1.0 + (days_ahead as f32 * 0.01), // 1% increase per day
+            TrendDirection::Decreasing => 1.0 - (days_ahead as f32 * 0.005), // 0.5% decrease per day
+            TrendDirection::Stable => 1.0,
+        };
+        
+        let predicted_price = (current_price as f32 * predicted_multiplier.clamp(0.5, 3.0)) as u64;
+        
+        PriceTrendPrediction {
+            current_price,
+            predicted_price,
+            confidence: self.calculate_prediction_confidence(),
+            trend_direction,
+            days_ahead,
+            factors: self.get_trend_factors(),
+        }
+    }
+    
+    fn calculate_prediction_confidence(&self) -> f32 {
+        // Confidence based on amount of historical data and stability
+        let data_points = self.pricing_history.len() as f32;
+        let base_confidence = (data_points / 100.0).min(0.8); // Max 80% from data
+        
+        // Reduce confidence if high volatility
+        let volatility = self.calculate_pricing_volatility();
+        let volatility_penalty = volatility * 0.3;
+        
+        (base_confidence - volatility_penalty).max(0.1)
+    }
+    
+    fn calculate_pricing_volatility(&self) -> f32 {
+        if self.pricing_history.len() < 2 {
+            return 0.0;
+        }
+        
+        let mut volatility = 0.0;
+        for i in 1..self.pricing_history.len() {
+            let prev = &self.pricing_history[i - 1];
+            let curr = &self.pricing_history[i];
+            
+            let change = (curr.demand_score - prev.demand_score).abs() / prev.demand_score;
+            volatility += change;
+        }
+        
+        volatility / (self.pricing_history.len() - 1) as f32
+    }
+    
+    fn get_trend_factors(&self) -> Vec<String> {
+        let mut factors = Vec::new();
+        
+        if self.network_metrics.consensus_participation < 0.8 {
+            factors.push("Low consensus participation".to_string());
+        }
+        
+        if self.demand_metrics.renewal_rate < 0.8 {
+            factors.push("Low renewal rate".to_string());
+        }
+        
+        if self.network_metrics.network_utilization > 0.8 {
+            factors.push("High network utilization".to_string());
+        }
+        
+        factors
+    }
+
     /// Get current pricing information
     pub fn get_current_pricing(&self) -> &DomainPricing {
         &self.pricing
@@ -398,6 +562,52 @@ impl AdaptivePricingContract {
     pub fn get_demand_metrics(&self) -> &DemandMetrics {
         &self.demand_metrics
     }
+}
+
+/// Market indicators for advanced pricing
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MarketIndicators {
+    pub trending_keywords: Vec<String>,
+    pub competition_factor: f32,
+    pub time_factor: f32,
+    pub market_volatility: f32,
+    pub external_demand_signals: Vec<DemandSignal>,
+}
+
+/// External demand signals
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DemandSignal {
+    pub source: String,
+    pub signal_type: SignalType,
+    pub strength: f32,
+    pub timestamp: Timestamp,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SignalType {
+    SocialMediaMention,
+    SearchVolume,
+    CompetitorPricing,
+    NetworkActivity,
+    CreatorDemand,
+}
+
+/// Price trend prediction
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PriceTrendPrediction {
+    pub current_price: u64,
+    pub predicted_price: u64,
+    pub confidence: f32,
+    pub trend_direction: TrendDirection,
+    pub days_ahead: u32,
+    pub factors: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TrendDirection {
+    Increasing,
+    Decreasing,
+    Stable,
 }
 
 #[cfg(test)]
