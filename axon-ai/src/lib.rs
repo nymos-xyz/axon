@@ -12,6 +12,7 @@ pub mod predictive_privacy;
 pub mod privacy_ml;
 pub mod federated_ai;
 pub mod ai_analytics;
+pub mod social_computing;
 
 pub use error::{AIError, AIResult};
 pub use ai_moderation::{
@@ -41,6 +42,12 @@ pub use federated_ai::{
 pub use ai_analytics::{
     AIAnalytics, IntelligentInsights, ContentTrends,
     UserBehaviorPatterns, PredictiveAnalytics, AnalyticsConfig
+};
+pub use social_computing::{
+    SocialComputingEngine, SocialComputingConfig, ModerationRequest, AIModerationResult,
+    SocialAnalysisRequest, SocialAnalysisResult, ContentProcessingRequest, ContentProcessingResult,
+    RealtimeRecommendationRequest, RealtimeRecommendationResult, ModerationLevel, ViolationType,
+    ModerationAction, SocialAnalysisType, ContentProcessingType, RecommendationType
 };
 
 /// AI privacy protocol version

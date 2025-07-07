@@ -7,6 +7,7 @@
 pub mod error;
 pub mod privacy_search;
 pub mod distributed_index;
+pub mod advanced_search_engine;
 pub mod query_processing;
 pub mod result_ranking;
 pub mod search_analytics;
@@ -19,7 +20,11 @@ pub use privacy_search::{
 };
 pub use distributed_index::{
     DistributedSearchIndex, IndexConfig, IndexShard, 
-    IndexReplication, IndexStatistics
+    IndexReplication, IndexStatistics, ContentPrivacyLevel
+};
+pub use advanced_search_engine::{
+    AdvancedSearchEngine, AdvancedSearchConfig, AdvancedSearchQuery,
+    AdvancedSearchResult, SearchFilters, SearchPreferences
 };
 pub use query_processing::{
     QueryProcessor, QueryAnalysis, QueryRewrite, 

@@ -12,6 +12,7 @@ pub mod recording;
 pub mod interactive;
 pub mod privacy_streaming;
 pub mod media_analytics;
+pub mod advanced_content;
 
 pub use error::{MediaError, MediaResult};
 pub use streaming::{
@@ -41,6 +42,11 @@ pub use privacy_streaming::{
 pub use media_analytics::{
     MediaAnalytics, StreamingMetrics, ViewerAnalytics,
     ContentPerformance, PrivacyMetrics as MediaPrivacyMetrics
+};
+pub use advanced_content::{
+    AdvancedContentEngine, AdvancedContentConfig, RichMediaType, RichMediaContent,
+    InteractiveContentType, InteractiveContent, ScheduledContent, CompositionProject,
+    ContentPrivacySettings, SchedulingOptions, ComponentPrivacySettings
 };
 
 /// Media protocol version

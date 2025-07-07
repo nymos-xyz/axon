@@ -15,6 +15,7 @@ pub mod revenue;
 pub mod analytics;
 pub mod funding;
 pub mod creator_tools;
+pub mod anonymous_economy;
 
 // Re-export main types
 pub use error::{CreatorEconomyError, CreatorEconomyResult};
@@ -41,6 +42,11 @@ pub use funding::{
 pub use creator_tools::{
     CreatorDashboard, ContentMonetization, AudienceInsights,
     CreatorSupport, PrivacySettings
+};
+pub use anonymous_economy::{
+    AnonymousCreatorEconomyEngine, AnonymousEconomyConfig, AnonymousCreatorId,
+    AnonymousSubscription, AnonymousTip, RevenueDistribution, CreatorTier,
+    RevenuePrivacyLevel, CreatorProfile, SubscriberProfile, EconomyReport
 };
 
 /// Re-export commonly used types from dependencies

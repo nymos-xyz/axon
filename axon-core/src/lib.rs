@@ -9,6 +9,8 @@ pub mod domain;
 pub mod content;
 pub mod identity;
 pub mod errors;
+pub mod content_organization;
+pub mod performance_optimization;
 
 pub use types::*;
 pub use errors::{AxonError, Result};

@@ -20,6 +20,7 @@ pub mod feed;
 pub mod privacy;
 pub mod analytics;
 pub mod advanced_search;
+pub mod community_moderation;
 
 // Re-export main types
 pub use error::{SocialError, SocialResult};
@@ -29,6 +30,11 @@ pub use feed::{Feed, FeedItem, FeedGenerator, FeedAlgorithm, RankingStrategy};
 pub use privacy::{PrivacyLevel, PrivacyController, AnonymousProof, ProofType, SocialPrivacyManager};
 pub use analytics::{EngagementMetrics, UserMetrics, ContentMetrics, AnonymousAnalytics};
 pub use advanced_search::{AdvancedSearchEngine, SearchConfig, SearchResults, SearchResult, DiscoveryType};
+pub use community_moderation::{
+    CommunityModerationEngine, ModerationConfig, FilterType, FilterAction, FilterRule,
+    ContentReport, ReportType, ReportSeverity, ModerationAction, GovernanceProposal,
+    ContentAppeal, ModerationStats
+};
 
 /// Re-export commonly used types from dependencies
 pub use axon_core::{
