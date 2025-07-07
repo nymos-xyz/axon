@@ -8,6 +8,7 @@
 //! - Anti-spam and rate limiting with privacy preservation
 
 use std::collections::{HashMap, HashSet};
+use bincode;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc, Duration};
 use axon_core::{
@@ -65,6 +66,15 @@ pub enum InteractionType {
     Like,
     /// Dislike/downvote content
     Dislike,
+    /// Vote on content or proposals
+    Vote {
+        /// Vote choice (true for yes, false for no)
+        choice: bool,
+        /// Vote weight (based on reputation/stake)
+        weight: f64,
+        /// Optional reason for vote
+        reason: Option<String>,
+    },
     /// Reply to content
     Reply {
         /// Reply content
@@ -177,6 +187,44 @@ pub struct Like {
     pub created_at: DateTime<Utc>,
     /// Weight of the like (based on user reputation)
     pub weight: f64,
+}
+
+/// Vote interaction on content or proposals
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Vote {
+    /// Vote ID
+    pub id: String,
+    /// Content being voted on
+    pub content_id: ContentId,
+    /// Vote choice (true for yes, false for no)
+    pub choice: bool,
+    /// Vote weight (based on reputation/stake)
+    pub weight: f64,
+    /// Optional reason for vote
+    pub reason: Option<String>,
+    /// User who voted (anonymous if privacy_level != Public)
+    pub user_id: Option<String>,
+    /// Privacy level
+    pub privacy_level: PrivacyLevel,
+    /// Timestamp
+    pub created_at: DateTime<Utc>,
+    /// Vote type (like, proposal, poll)
+    pub vote_type: VoteType,
+}
+
+/// Types of votes
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum VoteType {
+    /// Like-based voting ("every like is like a vote")
+    Like,
+    /// Formal proposal voting
+    Proposal,
+    /// Community poll
+    Poll,
+    /// Content quality rating
+    Quality,
+    /// Moderation decision
+    Moderation,
 }
 
 /// Share/repost of content
@@ -381,6 +429,97 @@ impl InteractionManager {
             privacy_level,
             created_at: like.created_at,
             metadata: Some(bincode::serialize(&like)?),
+            proof,
+        };
+
+        // Store interaction
+        self.store_interaction(interaction.clone())?;
+
+        // Update user history
+        self.update_user_history(&identity.get_id(), &interaction);
+
+        Ok(interaction)
+    }
+
+    /// Vote on content (combines like functionality)
+    pub async fn vote_on_content(
+        &mut self,
+        identity: &Identity,
+        content_id: ContentId,
+        choice: bool,
+        vote_type: VoteType,
+        reason: Option<String>,
+        privacy_level: PrivacyLevel,
+        auth_service: &AuthService,
+    ) -> SocialResult<Interaction> {
+        // Check rate limits
+        self.check_rate_limits(&identity.get_id())?;
+
+        // Check if user already voted on this content
+        if self.has_user_interacted(&identity.get_id(), &content_id, &InteractionType::Vote { 
+            choice, 
+            weight: 0.0, 
+            reason: reason.clone() 
+        })? {
+            return Err(SocialError::InvalidOperation("User already voted on this content".to_string()));
+        }
+
+        // Generate vote ID
+        let vote_id = self.generate_interaction_id(&identity.get_id(), &content_id, "vote");
+
+        // Get user reputation for vote weight
+        let reputation = self.get_user_reputation(&identity.get_id());
+        let weight = if privacy_level == PrivacyLevel::Public {
+            self.calculate_vote_weight(reputation, &vote_type)
+        } else {
+            self.calculate_vote_weight(reputation, &vote_type) * self.settings.anonymous_weight_multiplier
+        };
+
+        // Create vote
+        let vote = Vote {
+            id: vote_id.clone(),
+            content_id: content_id.clone(),
+            choice,
+            weight,
+            reason: reason.clone(),
+            user_id: match privacy_level {
+                PrivacyLevel::Public => Some(identity.get_id()),
+                _ => None,
+            },
+            privacy_level: privacy_level.clone(),
+            created_at: Utc::now(),
+            vote_type: vote_type.clone(),
+        };
+
+        // Generate proof if anonymous
+        let proof = if privacy_level != PrivacyLevel::Public {
+            Some(self.generate_interaction_proof(
+                identity,
+                &content_id,
+                &InteractionType::Vote { 
+                    choice, 
+                    weight,
+                    reason: reason.clone() 
+                },
+                auth_service,
+            ).await?)
+        } else {
+            None
+        };
+
+        // Create interaction record
+        let interaction = Interaction {
+            id: vote_id,
+            content_id: content_id.clone(),
+            interaction_type: InteractionType::Vote { 
+                choice, 
+                weight,
+                reason: reason.clone() 
+            },
+            user_id: vote.user_id.clone(),
+            privacy_level,
+            created_at: vote.created_at,
+            metadata: Some(bincode::serialize(&vote)?),
             proof,
         };
 
@@ -635,6 +774,15 @@ impl InteractionManager {
             match &interaction.interaction_type {
                 InteractionType::Like => counts.likes += 1,
                 InteractionType::Dislike => counts.dislikes += 1,
+                InteractionType::Vote { choice, weight, .. } => {
+                    if *choice {
+                        counts.votes_yes += 1;
+                        counts.vote_weight_yes += weight;
+                    } else {
+                        counts.votes_no += 1;
+                        counts.vote_weight_no += weight;
+                    }
+                },
                 InteractionType::Reply { .. } => counts.replies += 1,
                 InteractionType::Comment { .. } => counts.comments += 1,
                 InteractionType::Share { .. } => counts.shares += 1,
@@ -816,9 +964,114 @@ impl InteractionManager {
             .entry(interaction.interaction_type.clone())
             .or_insert(0) += 1;
 
+        // Update reputation based on voting behavior
+        if let InteractionType::Vote { choice, weight, .. } = &interaction.interaction_type {
+            // Positive voting behavior slightly increases reputation
+            if *choice {
+                history.reputation += 0.001; // Small positive boost
+            }
+            // Cap reputation at reasonable bounds
+            history.reputation = history.reputation.min(10.0).max(0.1);
+        }
+
         // Keep only recent interactions (last 24 hours)
         let cutoff = Utc::now() - Duration::hours(24);
         history.recent_interactions.retain(|&timestamp| timestamp > cutoff);
+    }
+
+    /// Calculate vote weight based on reputation and vote type
+    fn calculate_vote_weight(&self, reputation: f64, vote_type: &VoteType) -> f64 {
+        match vote_type {
+            VoteType::Like => reputation,
+            VoteType::Proposal => reputation * 1.5, // Proposal votes have higher weight
+            VoteType::Poll => reputation * 0.8,     // Poll votes have lower weight
+            VoteType::Quality => reputation * 1.2,  // Quality votes moderately weighted
+            VoteType::Moderation => reputation * 2.0, // Moderation votes heavily weighted
+        }
+    }
+
+    /// Get voting results for content
+    pub fn get_voting_results(&self, content_id: &ContentId) -> SocialResult<VotingResults> {
+        let interactions = self.interactions
+            .get(content_id)
+            .unwrap_or(&Vec::new());
+
+        let mut results = VotingResults::default();
+
+        for interaction in interactions {
+            if let InteractionType::Vote { choice, weight, .. } = &interaction.interaction_type {
+                results.total_votes += 1;
+                results.total_weight += weight;
+                
+                if *choice {
+                    results.yes_votes += 1;
+                    results.yes_weight += weight;
+                } else {
+                    results.no_votes += 1;
+                    results.no_weight += weight;
+                }
+            }
+        }
+
+        // Calculate percentages
+        if results.total_votes > 0 {
+            results.yes_percentage = (results.yes_votes as f64 / results.total_votes as f64) * 100.0;
+            results.no_percentage = (results.no_votes as f64 / results.total_votes as f64) * 100.0;
+        }
+        
+        if results.total_weight > 0.0 {
+            results.yes_weight_percentage = (results.yes_weight / results.total_weight) * 100.0;
+            results.no_weight_percentage = (results.no_weight / results.total_weight) * 100.0;
+        }
+
+        Ok(results)
+    }
+
+    /// Get vote breakdown by type
+    pub fn get_vote_breakdown(&self, content_id: &ContentId) -> SocialResult<VoteBreakdown> {
+        let interactions = self.interactions
+            .get(content_id)
+            .unwrap_or(&Vec::new());
+
+        let mut breakdown = VoteBreakdown::default();
+
+        for interaction in interactions {
+            if let InteractionType::Vote { choice, weight, .. } = &interaction.interaction_type {
+                // Extract vote type from metadata
+                if let Some(metadata) = &interaction.metadata {
+                    if let Ok(vote) = bincode::deserialize::<Vote>(metadata) {
+                        let entry = breakdown.by_type.entry(vote.vote_type.clone())
+                            .or_insert_with(VotingResults::default);
+                        
+                        entry.total_votes += 1;
+                        entry.total_weight += weight;
+                        
+                        if *choice {
+                            entry.yes_votes += 1;
+                            entry.yes_weight += weight;
+                        } else {
+                            entry.no_votes += 1;
+                            entry.no_weight += weight;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Calculate percentages for each type
+        for (_, results) in breakdown.by_type.iter_mut() {
+            if results.total_votes > 0 {
+                results.yes_percentage = (results.yes_votes as f64 / results.total_votes as f64) * 100.0;
+                results.no_percentage = (results.no_votes as f64 / results.total_votes as f64) * 100.0;
+            }
+            
+            if results.total_weight > 0.0 {
+                results.yes_weight_percentage = (results.yes_weight / results.total_weight) * 100.0;
+                results.no_weight_percentage = (results.no_weight / results.total_weight) * 100.0;
+            }
+        }
+
+        Ok(breakdown)
     }
 
     fn hash_user_id(&self, user_id: &str) -> String {
@@ -837,6 +1090,10 @@ impl InteractionManager {
 pub struct InteractionCounts {
     pub likes: u32,
     pub dislikes: u32,
+    pub votes_yes: u32,
+    pub votes_no: u32,
+    pub vote_weight_yes: f64,
+    pub vote_weight_no: f64,
     pub replies: u32,
     pub comments: u32,
     pub shares: u32,
@@ -886,6 +1143,27 @@ impl SpamDetector {
     }
 }
 
+/// Voting results aggregation
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct VotingResults {
+    pub total_votes: u32,
+    pub yes_votes: u32,
+    pub no_votes: u32,
+    pub total_weight: f64,
+    pub yes_weight: f64,
+    pub no_weight: f64,
+    pub yes_percentage: f64,
+    pub no_percentage: f64,
+    pub yes_weight_percentage: f64,
+    pub no_weight_percentage: f64,
+}
+
+/// Vote breakdown by type
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct VoteBreakdown {
+    pub by_type: HashMap<VoteType, VotingResults>,
+}
+
 impl Default for InteractionManager {
     fn default() -> Self {
         Self::new()
@@ -913,9 +1191,66 @@ mod tests {
             &auth_service,
         ).await.unwrap();
 
-        assert_eq!(interaction.interaction_type, InteractionType::Like);
+        // Like is now converted to Vote with Like type
+        if let InteractionType::Vote { choice, .. } = interaction.interaction_type {
+            assert!(choice); // Should be true for like
+        } else {
+            panic!("Expected Vote interaction type for like");
+        }
         assert_eq!(interaction.content_id, content_id);
         assert_eq!(interaction.privacy_level, PrivacyLevel::Public);
+    }
+
+    #[tokio::test]
+    async fn test_vote_on_content() {
+        let mut manager = InteractionManager::new();
+        let identity = Identity::new_for_test("user1");
+        let content_id = ContentId::new("test_proposal");
+        let auth_service = AuthService::new_for_test();
+
+        let interaction = manager.vote_on_content(
+            &identity,
+            content_id.clone(),
+            true,
+            VoteType::Proposal,
+            Some("I agree with this proposal".to_string()),
+            PrivacyLevel::Anonymous,
+            &auth_service,
+        ).await.unwrap();
+
+        if let InteractionType::Vote { choice, weight, reason } = &interaction.interaction_type {
+            assert!(*choice);
+            assert!(*weight > 0.0); // Should have weight based on reputation
+            assert!(reason.is_some());
+        } else {
+            panic!("Expected Vote interaction type");
+        }
+
+        assert_eq!(interaction.content_id, content_id);
+        assert_eq!(interaction.privacy_level, PrivacyLevel::Anonymous);
+        assert!(interaction.user_id.is_none()); // Anonymous
+        assert!(interaction.proof.is_some()); // Should have proof for anonymous
+    }
+
+    #[tokio::test]
+    async fn test_voting_results() {
+        let mut manager = InteractionManager::new();
+        let identity1 = Identity::new_for_test("user1");
+        let identity2 = Identity::new_for_test("user2");
+        let content_id = ContentId::new("test_poll");
+        let auth_service = AuthService::new_for_test();
+
+        // Add multiple votes
+        manager.vote_on_content(&identity1, content_id.clone(), true, VoteType::Poll, None, PrivacyLevel::Public, &auth_service).await.unwrap();
+        manager.vote_on_content(&identity2, content_id.clone(), false, VoteType::Poll, None, PrivacyLevel::Public, &auth_service).await.unwrap();
+
+        let results = manager.get_voting_results(&content_id).unwrap();
+        assert_eq!(results.total_votes, 2);
+        assert_eq!(results.yes_votes, 1);
+        assert_eq!(results.no_votes, 1);
+        assert_eq!(results.yes_percentage, 50.0);
+        assert_eq!(results.no_percentage, 50.0);
+        assert!(results.total_weight > 0.0);
     }
 
     #[tokio::test]
@@ -958,14 +1293,16 @@ mod tests {
 
         // Add multiple interactions
         manager.like_content(&identity, content_id.clone(), true, PrivacyLevel::Public, &auth_service).await.unwrap();
+        manager.vote_on_content(&identity, content_id.clone(), true, VoteType::Quality, None, PrivacyLevel::Public, &auth_service).await.unwrap();
         
         let reply_content = Content::new_for_test("Reply", ContentType::Text);
         manager.reply_to_content(&identity, content_id.clone(), None, reply_content, PrivacyLevel::Public, &auth_service).await.unwrap();
 
         let counts = manager.get_interaction_counts(&content_id).unwrap();
-        assert_eq!(counts.likes, 1);
+        assert_eq!(counts.votes_yes, 2); // Like + Quality vote
+        assert_eq!(counts.votes_no, 0);
         assert_eq!(counts.replies, 1);
-        assert_eq!(counts.dislikes, 0);
+        assert!(counts.vote_weight_yes > 0.0);
     }
 
     #[test]
@@ -983,5 +1320,41 @@ mod tests {
 
         // Next interaction should fail
         assert!(manager.check_rate_limits(user_id).is_err());
+    }
+
+    #[test]
+    fn test_vote_weight_calculation() {
+        let manager = InteractionManager::new();
+        let reputation = 2.0;
+        
+        assert_eq!(manager.calculate_vote_weight(reputation, &VoteType::Like), 2.0);
+        assert_eq!(manager.calculate_vote_weight(reputation, &VoteType::Proposal), 3.0);
+        assert_eq!(manager.calculate_vote_weight(reputation, &VoteType::Poll), 1.6);
+        assert_eq!(manager.calculate_vote_weight(reputation, &VoteType::Quality), 2.4);
+        assert_eq!(manager.calculate_vote_weight(reputation, &VoteType::Moderation), 4.0);
+    }
+
+    #[tokio::test]
+    async fn test_vote_breakdown() {
+        let mut manager = InteractionManager::new();
+        let identity = Identity::new_for_test("user1");
+        let content_id = ContentId::new("test_content");
+        let auth_service = AuthService::new_for_test();
+
+        // Add different types of votes
+        manager.vote_on_content(&identity, content_id.clone(), true, VoteType::Like, None, PrivacyLevel::Public, &auth_service).await.unwrap();
+        manager.vote_on_content(&identity, content_id.clone(), false, VoteType::Quality, None, PrivacyLevel::Public, &auth_service).await.unwrap();
+
+        let breakdown = manager.get_vote_breakdown(&content_id).unwrap();
+        assert!(breakdown.by_type.contains_key(&VoteType::Like));
+        assert!(breakdown.by_type.contains_key(&VoteType::Quality));
+        
+        let like_results = &breakdown.by_type[&VoteType::Like];
+        assert_eq!(like_results.yes_votes, 1);
+        assert_eq!(like_results.no_votes, 0);
+        
+        let quality_results = &breakdown.by_type[&VoteType::Quality];
+        assert_eq!(quality_results.yes_votes, 0);
+        assert_eq!(quality_results.no_votes, 1);
     }
 }
