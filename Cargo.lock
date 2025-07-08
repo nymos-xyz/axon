@@ -360,6 +360,7 @@ dependencies = [
  "axon-cli",
  "axon-contracts",
  "axon-core",
+ "axon-creator-economy",
  "axon-discovery",
  "axon-identity",
  "axon-media",
@@ -419,6 +420,24 @@ dependencies = [
  "tokio",
  "tracing",
  "x25519-dalek 1.1.1",
+]
+
+[[package]]
+name = "axon-creator-economy"
+version = "0.1.0"
+dependencies = [
+ "axon-core",
+ "axon-identity",
+ "bincode",
+ "chrono",
+ "hex",
+ "nym-crypto",
+ "serde",
+ "serde_json",
+ "sha3",
+ "tokio",
+ "tokio-test",
+ "uuid",
 ]
 
 [[package]]
@@ -4142,6 +4161,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bincode",
+ "chrono",
  "futures",
  "hex",
  "libp2p",
