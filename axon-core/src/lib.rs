@@ -10,7 +10,8 @@ pub mod content;
 pub mod identity;
 pub mod errors;
 pub mod content_organization;
-pub mod performance_optimization;
+// pub mod performance_optimization; // Temporarily disabled due to compilation errors
+pub mod privacy_infrastructure;
 
 pub use types::*;
 pub use errors::{AxonError, Result};

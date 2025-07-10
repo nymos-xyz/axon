@@ -409,8 +409,10 @@ dependencies = [
  "anyhow",
  "bincode",
  "blake3",
+ "chrono",
  "ed25519-dalek 1.0.1",
  "hex",
+ "md5",
  "postcard",
  "rand 0.7.3",
  "serde",
@@ -3662,6 +3664,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "md5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
+
+[[package]]
 name = "measure_time"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4743,6 +4751,8 @@ dependencies = [
 name = "quid-core"
 version = "0.1.0"
 dependencies = [
+ "bincode",
+ "chrono",
  "hex",
  "rand 0.8.5",
  "secrecy",
@@ -4750,6 +4760,8 @@ dependencies = [
  "serde_json",
  "sha3",
  "thiserror 1.0.69",
+ "tokio",
+ "uuid",
  "zeroize",
 ]
 

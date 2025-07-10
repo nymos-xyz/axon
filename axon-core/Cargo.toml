@@ -19,6 +19,9 @@ postcard = { workspace = true }
 tracing = { workspace = true }
 hex = "0.4"
 rand = "0.7"
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1.0", features = ["macros", "rt", "sync"] }
+md5 = "0.7"
 
 [dev-dependencies]
 tokio = { workspace = true }

@@ -28,8 +28,8 @@ pub enum AxonError {
     #[error("Authentication failed")]
     AuthenticationFailed,
     
-    #[error("Permission denied")]
-    PermissionDenied,
+    #[error("Permission denied: {0}")]
+    PermissionDenied(String),
     
     #[error("Content not found")]
     ContentNotFound,
@@ -37,11 +37,17 @@ pub enum AxonError {
     #[error("Domain not found")]
     DomainNotFound,
     
+    #[error("Not found: {0}")]
+    NotFound(String),
+    
     #[error("Invalid signature")]
     InvalidSignature,
     
     #[error("Protocol version mismatch")]
     VersionMismatch,
+    
+    #[error("Privacy error: {0}")]
+    Privacy(String),
     
     #[error("Internal error: {0}")]
     Internal(String),

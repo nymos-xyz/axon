@@ -30,7 +30,7 @@ impl fmt::Display for ContentHash {
 impl ContentHash {
     /// Create a ContentHash from a string (for testing)
     #[cfg(test)]
-    pub fn new(data: &str) -> Self {
+    pub fn from_string(data: &str) -> Self {
         use sha3::{Digest, Sha3_256};
         let mut hasher = Sha3_256::new();
         hasher.update(data.as_bytes());
