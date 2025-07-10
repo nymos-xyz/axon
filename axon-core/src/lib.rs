@@ -10,6 +10,7 @@ pub mod content;
 pub mod identity;
 pub mod errors;
 pub mod content_organization;
+pub mod domain_management;
 // pub mod performance_optimization; // Temporarily disabled due to compilation errors
 pub mod privacy_infrastructure;
 

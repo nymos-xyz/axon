@@ -63,7 +63,7 @@ pub struct DomainMetadata {
 }
 
 /// Domain verification status
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum VerificationStatus {
     Unverified,
     Pending,
